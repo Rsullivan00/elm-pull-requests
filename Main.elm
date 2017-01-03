@@ -4,6 +4,8 @@ import Html exposing (..)
 import Html.App as Html
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Http
+import Task exposing (Task)
 
 
 main : Program Never
@@ -21,13 +23,13 @@ main =
 
 
 type alias Model =
-  { name : String
+  { value : String
   }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model "Missing PR description", Cmd.none )
+  ( Model "", fetchPRInfoCmd )
 
 
 
@@ -35,14 +37,42 @@ init =
 
 
 type Msg
-  = Something
+  = HttpError Http.Error
+  | FetchPRInfoSuccess String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    Something ->
-      ( model, Cmd.none )
+    HttpError error ->
+      ( { model | value = "Error: " ++ (toString error) }, Cmd.none )
+
+    FetchPRInfoSuccess result ->
+      ( { model | value = result }, Cmd.none )
+
+
+
+-- API stuff
+
+
+api : String
+api =
+  "http://localhost:3000/"
+
+
+prInfoUrl : String
+prInfoUrl =
+  api ++ "stats"
+
+
+fetchPRInfo : Platform.Task Http.Error String
+fetchPRInfo =
+  Http.getString prInfoUrl
+
+
+fetchPRInfoCmd : Cmd Msg
+fetchPRInfoCmd =
+  Task.perform HttpError FetchPRInfoSuccess fetchPRInfo
 
 
 
@@ -53,4 +83,5 @@ view : Model -> Html Msg
 view model =
   div [ class "container" ]
     [ h3 [] [ text "Pull requests by author" ]
+    , p [] [ text model.value ]
     ]
