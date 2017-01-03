@@ -39,6 +39,7 @@ init =
 type Msg
   = HttpError Http.Error
   | FetchPRInfoSuccess String
+  | RefreshPRInfo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -49,6 +50,9 @@ update msg model =
 
     FetchPRInfoSuccess result ->
       ( { model | value = result }, Cmd.none )
+
+    RefreshPRInfo ->
+      ( model, fetchPRInfoCmd )
 
 
 
@@ -84,4 +88,5 @@ view model =
   div [ class "container" ]
     [ h3 [] [ text "Pull requests by author" ]
     , p [] [ text model.value ]
+    , button [ class "btn btn-default", onClick RefreshPRInfo ] [ text "Refresh" ]
     ]
