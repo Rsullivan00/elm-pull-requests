@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Task exposing (Task)
+import Json.Decode as Decode exposing ((:=), Decoder)
 
 
 main : Program Never
@@ -23,13 +24,25 @@ main =
 
 
 type alias Model =
-  { value : String
+  { repos : List RepoStats
+  , errorDescription : String
+  }
+
+
+type alias RepoStats =
+  { name : String
+  , prs : List PRInfo
+  }
+
+
+type alias PRInfo =
+  { title : String
   }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model "", fetchPRInfoCmd )
+  ( Model [] "", fetchStatsCmd )
 
 
 
@@ -38,21 +51,21 @@ init =
 
 type Msg
   = HttpError Http.Error
-  | FetchPRInfoSuccess String
-  | RefreshPRInfo
+  | FetchStats (List RepoStats)
+  | RefreshStats
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     HttpError error ->
-      ( { model | value = "Error: " ++ (toString error) }, Cmd.none )
+      ( { model | errorDescription = "Error: " ++ (toString error) }, Cmd.none )
 
-    FetchPRInfoSuccess result ->
-      ( { model | value = result }, Cmd.none )
+    FetchStats result ->
+      ( { model | repos = result }, Cmd.none )
 
-    RefreshPRInfo ->
-      ( model, fetchPRInfoCmd )
+    RefreshStats ->
+      ( model, fetchStatsCmd )
 
 
 
@@ -64,19 +77,32 @@ api =
   "http://localhost:3000/"
 
 
-prInfoUrl : String
-prInfoUrl =
+statsUrl : String
+statsUrl =
   api ++ "stats"
 
 
-fetchPRInfo : Platform.Task Http.Error String
-fetchPRInfo =
-  Http.getString prInfoUrl
+prInfoDecoder : Decoder PRInfo
+prInfoDecoder =
+  Decode.map PRInfo
+    ("title" := Decode.string)
 
 
-fetchPRInfoCmd : Cmd Msg
-fetchPRInfoCmd =
-  Task.perform HttpError FetchPRInfoSuccess fetchPRInfo
+repoStatsDecoder : Decoder RepoStats
+repoStatsDecoder =
+  Decode.object2 RepoStats
+    ("repo" := Decode.string)
+    ("prs" := (Decode.list prInfoDecoder))
+
+
+fetchStats : Platform.Task Http.Error (List RepoStats)
+fetchStats =
+  Http.get (Decode.list repoStatsDecoder) statsUrl
+
+
+fetchStatsCmd : Cmd Msg
+fetchStatsCmd =
+  Task.perform HttpError FetchStats fetchStats
 
 
 
@@ -87,6 +113,17 @@ view : Model -> Html Msg
 view model =
   div [ class "container" ]
     [ h3 [] [ text "Pull requests by author" ]
-    , p [] [ text model.value ]
-    , button [ class "btn btn-default", onClick RefreshPRInfo ] [ text "Refresh" ]
+    , h4 [] [ text model.errorDescription ]
+    , div [] (List.map viewRepo model.repos)
+    , button [ class "btn btn-default", onClick RefreshStats ] [ text "Refresh" ]
     ]
+
+
+viewRepo : RepoStats -> Html msg
+viewRepo repoStats =
+  div [] [ text (repoStats.name) ]
+
+
+viewPR : PRInfo -> Html msg
+viewPR prinfo =
+  div [] [ text (prinfo.title) ]
