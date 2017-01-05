@@ -37,6 +37,7 @@ type alias RepoStats =
 
 type alias PRInfo =
   { title : String
+  , user : String
   }
 
 
@@ -84,8 +85,9 @@ statsUrl =
 
 prInfoDecoder : Decoder PRInfo
 prInfoDecoder =
-  Decode.map PRInfo
+  Decode.object2 PRInfo
     ("title" := Decode.string)
+    (Decode.oneOf [ "user" := Decode.string, Decode.succeed "No User" ])
 
 
 repoStatsDecoder : Decoder RepoStats
@@ -112,7 +114,7 @@ fetchStatsCmd =
 view : Model -> Html Msg
 view model =
   div [ class "container" ]
-    [ h3 [] [ text "Pull requests by author" ]
+    [ h1 [] [ text "Pull requests by author" ]
     , h4 [] [ text model.errorDescription ]
     , div [] (List.map viewRepo model.repos)
     , button [ class "btn btn-default", onClick RefreshStats ] [ text "Refresh" ]
@@ -121,9 +123,16 @@ view model =
 
 viewRepo : RepoStats -> Html msg
 viewRepo repoStats =
-  div [] [ text (repoStats.name) ]
+  div []
+    [ h3 [] [ text (repoStats.name) ]
+    , div [] (List.map viewPR repoStats.prs)
+    ]
 
 
 viewPR : PRInfo -> Html msg
 viewPR prinfo =
-  div [] [ text (prinfo.title) ]
+  div []
+    [ text (prinfo.title)
+    , text " by "
+    , text (prinfo.user)
+    ]
