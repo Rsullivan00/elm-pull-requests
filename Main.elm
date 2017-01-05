@@ -114,10 +114,14 @@ fetchStatsCmd =
 view : Model -> Html Msg
 view model =
   div [ class "container" ]
-    [ h1 [] [ text "Pull requests by author" ]
+    [ h1 [] [ text "Open pull requests" ]
     , h4 [] [ text model.errorDescription ]
     , div [] (List.map viewRepo model.repos)
-    , button [ class "btn btn-default", onClick RefreshStats ] [ text "Refresh" ]
+    , button [ class "btn", onClick RefreshStats ]
+        [ i [ class "material-icons left" ]
+            [ text "loop" ]
+        , text "Refresh"
+        ]
     ]
 
 
