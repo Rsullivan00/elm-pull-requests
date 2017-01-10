@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import Task exposing (Task)
 import Json.Decode as Decode exposing ((:=), Decoder)
+import Repo
 
 
 main : Program Never
@@ -24,14 +25,8 @@ main =
 
 
 type alias Model =
-  { repos : List RepoStats
+  { repos : List Repo.Model
   , errorDescription : String
-  }
-
-
-type alias RepoStats =
-  { name : String
-  , prs : List PRInfo
   }
 
 
@@ -52,7 +47,7 @@ init =
 
 type Msg
   = HttpError Http.Error
-  | FetchStats (List RepoStats)
+  | FetchStats (List Repo.Model)
   | RefreshStats
 
 
@@ -83,23 +78,9 @@ statsUrl =
   api ++ "stats"
 
 
-prInfoDecoder : Decoder PRInfo
-prInfoDecoder =
-  Decode.object2 PRInfo
-    ("title" := Decode.string)
-    (Decode.oneOf [ "user" := Decode.string, Decode.succeed "No User" ])
-
-
-repoStatsDecoder : Decoder RepoStats
-repoStatsDecoder =
-  Decode.object2 RepoStats
-    ("repo" := Decode.string)
-    ("prs" := (Decode.list prInfoDecoder))
-
-
-fetchStats : Platform.Task Http.Error (List RepoStats)
+fetchStats : Platform.Task Http.Error (List Repo.Model)
 fetchStats =
-  Http.get (Decode.list repoStatsDecoder) statsUrl
+  Http.get (Decode.list Repo.decoder) statsUrl
 
 
 fetchStatsCmd : Cmd Msg
@@ -116,27 +97,10 @@ view model =
   div [ class "container" ]
     [ h1 [] [ text "Open pull requests" ]
     , h4 [] [ text model.errorDescription ]
-    , div [] (List.map viewRepo model.repos)
+    , div [] (List.map Repo.view model.repos)
     , button [ class "btn", onClick RefreshStats ]
         [ i [ class "material-icons left" ]
             [ text "loop" ]
         , text "Refresh"
         ]
-    ]
-
-
-viewRepo : RepoStats -> Html msg
-viewRepo repoStats =
-  div []
-    [ h3 [] [ text (repoStats.name) ]
-    , div [] (List.map viewPR repoStats.prs)
-    ]
-
-
-viewPR : PRInfo -> Html msg
-viewPR prinfo =
-  div []
-    [ text (prinfo.title)
-    , text " by "
-    , text (prinfo.user)
     ]
