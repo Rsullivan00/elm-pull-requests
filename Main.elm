@@ -10,6 +10,7 @@ import Json.Decode as Decode exposing ((:=), Decoder)
 import Dict
 import Repo
 import Author
+import Utils exposing (..)
 
 
 main : Program Never
@@ -59,24 +60,6 @@ update msg model =
 
     RefreshStats ->
       ( model, fetchStatsCmd )
-
-
-listToDictOfLists : List ( comparable, a ) -> Dict.Dict comparable (List a)
-listToDictOfLists list =
-  let
-    insertBoth key leftVal rightVal dict =
-      Dict.insert key (leftVal ++ rightVal) dict
-
-    mergeDicts d1 d2 =
-      Dict.merge Dict.insert insertBoth Dict.insert d1 d2 Dict.empty
-
-    listOfDicts l =
-      List.map (\( a, b ) -> Dict.insert a [ b ] Dict.empty) l
-
-    dictOfLists l =
-      (List.foldl (\a b -> mergeDicts a b) Dict.empty) (listOfDicts l)
-  in
-    dictOfLists list
 
 
 reposToAuthors : List Repo.Model -> List Author.Model
