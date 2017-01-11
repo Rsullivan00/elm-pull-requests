@@ -5,6 +5,7 @@ import Html.App as Html
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Http
+import Array
 import Task exposing (Task)
 import Json.Decode as Decode exposing ((:=), Decoder)
 import Dict
@@ -29,14 +30,14 @@ main =
 
 type alias Model =
   { repos : List Repo.Model
-  , authors : List Author.Model
+  , authors : Array.Array Author.Model
   , errorDescription : String
   }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model [] [] "", fetchStatsCmd )
+  ( Model [] Array.empty "", fetchStatsCmd )
 
 
 
@@ -63,10 +64,31 @@ update msg model =
       ( model, fetchStatsCmd )
 
     AuthorMsg i authorMessage ->
-      ( model, Cmd.none )
+      case Array.get i model.authors of
+        Nothing ->
+          ( model, Cmd.none )
+
+        Just author ->
+          let
+            authors =
+              model.authors
+
+            ( updatedAuthor, authorCmd ) =
+              Author.update authorMessage author
+
+            beforeAuthors =
+              Array.slice 0 i authors
+
+            afterAuthors =
+              Array.slice (i + 1) (Array.length authors) authors
+
+            updatedAuthors =
+              Array.append (Array.push updatedAuthor beforeAuthors) afterAuthors
+          in
+            ( { model | authors = updatedAuthors }, Cmd.none )
 
 
-reposToAuthors : List Repo.Model -> List Author.Model
+reposToAuthors : List Repo.Model -> Array.Array Author.Model
 reposToAuthors repos =
   let
     flattenedPRList =
@@ -78,7 +100,7 @@ reposToAuthors repos =
     authorDict =
       Dict.map (\key value -> Author.create key value) prDict
   in
-    Dict.values authorDict
+    Array.fromList (Dict.values authorDict)
 
 
 
@@ -111,11 +133,13 @@ fetchStatsCmd =
 -- VIEW
 
 
-viewAuthors : List Author.Model -> List (Html Msg)
+viewAuthors : Array.Array Author.Model -> List (Html Msg)
 viewAuthors authors =
-  List.indexedMap
-    (\i author -> Html.map (AuthorMsg i) (Author.view author))
-    authors
+  Array.toList
+    (Array.indexedMap
+      (\i author -> Html.map (AuthorMsg i) (Author.view author))
+      authors
+    )
 
 
 view : Model -> Html Msg
