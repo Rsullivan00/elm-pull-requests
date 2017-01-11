@@ -1,7 +1,7 @@
 .user-wrapper {
   display: inline-block;
   position: absolute;
-  top: 30%;
+  top: 20%;
 }
 
 .user-icon {
@@ -52,18 +52,58 @@ body {
   left: 10px;
 }
 
+
 .pr-count-1 {
   left: 9%;
+}
+
+.pr-count-1:nth-of-type(1) {
+  top: 35%;
+}
+
+.pr-count-1:nth-of-type(2) {
+  top: 50%;
+}
+
+.pr-count-1:nth-of-type(3) {
+  top: 65%;
+}
+
+.pr-count-1:nth-of-type(4) {
+  top: 80%;
 }
 
 .pr-count-2 {
   left: 34%;
 }
 
+.pr-count-2:nth-of-type(1) {
+  top: 35%;
+}
+
+.pr-count-2:nth-of-type(2) {
+  top: 50%;
+}
+
+.pr-count-2:nth-of-type(3) {
+  top: 65%;
+}
+
 .pr-count-3 {
   left: 59%;
 }
 
+.pr-count-3:nth-of-type(1) {
+  top: 35%;
+}
+
+.pr-count-3:nth-of-type(2) {
+  top: 50%;
+}
+
+.pr-count-3:nth-of-type(3) {
+  top: 65%;
+}
 .pr-count-4, .pr-count-5, .pr-count-6, .pr-count-7, .pr-count-8, .pr-count-9 {
   left: 84%;
 }
@@ -72,18 +112,20 @@ body {
   padding-top: 20px;
   display: inline-block;
   position: absolute;
+  font-weight: bold;
+  font-size: 5em;
 }
 
 .header-1 {
-  left: 10.5%;
+  left: 11%;
 }
 
 .header-2 {
-  left: 35.5%;
+  left: 36%;
 }
 
 .header-3 {
-  left: 60%;
+  left: 61%;
 }
 
 .header-4 {
@@ -91,9 +133,9 @@ body {
 }
 
 html {
-background: #16A085; /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #16A085 , #F4D03F); /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to right, #16A085 , #F4D03F); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+/* background: #16A085; /* fallback for old browsers */ */
+/* background: -webkit-linear-gradient(to right, #16A085 , #F4D03F); /* Chrome 10-25, Safari 5.1-6 */ */
+/* background: linear-gradient(to right, #16A085 , #F4D03F); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ */
 
 
 /* background: #3CA55C; /* fallback for old browsers */ */
@@ -101,8 +143,8 @@ background: linear-gradient(to right, #16A085 , #F4D03F); /* W3C, IE 10+/ Edge, 
 /* background: linear-gradient(to bottom, #3CA55C , #B5AC49); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ */
 
 
-/* background: #E55D87; /* fallback for old browsers */ */
-/* background: -webkit-linear-gradient(to bottom, #E55D87 , #5FC3E4); /* Chrome 10-25, Safari 5.1-6 */ */
-/* background: linear-gradient(to bottom, #E55D87 , #5FC3E4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ */
+background: #E55D87; /* fallback for old browsers */
+background: -webkit-linear-gradient(to left, #E55D87 , #5FC3E4); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to left, #E55D87 , #5FC3E4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 /*  */
 }
