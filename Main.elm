@@ -72,7 +72,7 @@ reposToAuthors repos =
       listToDictOfLists flattenedPRList
 
     authorDict =
-      Dict.map (\key value -> Author.Model key value) prDict
+      Dict.map (\key value -> Author.create key value) prDict
   in
     Dict.values authorDict
 
@@ -107,7 +107,7 @@ fetchStatsCmd =
 
 view : Model -> Html Msg
 view model =
-  div [ class "container" ]
+  div [ class "app-container" ]
     [ h1 [] [ text "Open pull requests" ]
     , h4 [] [ text model.errorDescription ]
     , div [] (List.map Author.view model.authors)

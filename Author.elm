@@ -13,17 +13,41 @@ import PullRequest
 type alias Model =
   { name : String
   , prs : List PullRequest.Model
+  , expanded : Bool
   }
+
+
+create : String -> List PullRequest.Model -> Model
+create name prs =
+  Model name prs True
 
 
 
 -- UPDATE
+
+
+type Msg
+  = ToggleOpen
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    ToggleOpen ->
+      ( { model | expanded = not model.expanded }, Cmd.none )
+
+
+githubImageLocation : Model -> String
+githubImageLocation model =
+  "https://invent.focusvision.com/" ++ model.name ++ ".png?size=400"
+
+
+
 -- VIEW
 
 
 view : Model -> Html msg
 view model =
-  div []
-    [ h3 [] [ text (model.name) ]
-    , div [] (List.map PullRequest.view model.prs)
+  div [ class "user-wrapper" ]
+    [ img [ src (githubImageLocation model), class "user-icon circle" ] []
     ]
