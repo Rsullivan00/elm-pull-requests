@@ -47,6 +47,7 @@ type Msg
   = HttpError Http.Error
   | FetchStats (List Repo.Model)
   | RefreshStats
+  | AuthorMsg Int Author.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,6 +61,9 @@ update msg model =
 
     RefreshStats ->
       ( model, fetchStatsCmd )
+
+    AuthorMsg i authorMessage ->
+      ( model, Cmd.none )
 
 
 reposToAuthors : List Repo.Model -> List Author.Model
@@ -98,11 +102,20 @@ fetchStats =
 
 fetchStatsCmd : Cmd Msg
 fetchStatsCmd =
-  Task.perform HttpError FetchStats fetchStats
+  Task.perform HttpError
+    FetchStats
+    fetchStats
 
 
 
 -- VIEW
+
+
+viewAuthors : List Author.Model -> List (Html Msg)
+viewAuthors authors =
+  List.indexedMap
+    (\i author -> Html.map (AuthorMsg i) (Author.view author))
+    authors
 
 
 view : Model -> Html Msg
@@ -110,7 +123,7 @@ view model =
   div [ class "app-container" ]
     [ h1 [] [ text "Open pull requests" ]
     , h4 [] [ text model.errorDescription ]
-    , div [] (List.map Author.view model.authors)
+    , div [] (viewAuthors model.authors)
     , button [ class "btn", onClick RefreshStats ]
         [ i [ class "material-icons left" ]
             [ text "loop" ]

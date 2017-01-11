@@ -19,7 +19,7 @@ type alias Model =
 
 create : String -> List PullRequest.Model -> Model
 create name prs =
-  Model name prs True
+  Model name prs False
 
 
 
@@ -46,8 +46,18 @@ githubImageLocation model =
 -- VIEW
 
 
-view : Model -> Html msg
+viewPRInfo : Model -> Html Msg
+viewPRInfo model =
+  if model.expanded then
+    div [ class "pr-descriptions" ]
+      (List.map PullRequest.view model.prs)
+  else
+    Html.text ""
+
+
+view : Model -> Html Msg
 view model =
   div [ class "user-wrapper" ]
-    [ img [ src (githubImageLocation model), class "user-icon circle" ] []
+    [ img [ src (githubImageLocation model), class "user-icon circle", onClick ToggleOpen ] []
+    , viewPRInfo model
     ]

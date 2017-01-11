@@ -35,6 +35,4 @@ view : Model -> Html msg
 view model =
   div []
     [ text (model.title)
-    , text " by "
-    , text (model.user)
     ]
