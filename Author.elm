@@ -49,7 +49,7 @@ githubImageLocation model =
 viewPRInfo : Model -> Html Msg
 viewPRInfo model =
   if model.expanded then
-    div [ class "pr-descriptions" ]
+    div [ class "pull-requests" ]
       (List.map PullRequest.view model.prs)
   else
     Html.text ""
@@ -57,7 +57,12 @@ viewPRInfo model =
 
 view : Model -> Html Msg
 view model =
-  div [ class "user-wrapper" ]
-    [ img [ src (githubImageLocation model), class "user-icon circle", onClick ToggleOpen ] []
+  div [ class ("user-wrapper pr-count-" ++ toString (List.length model.prs)) ]
+    [ img
+        [ src (githubImageLocation model)
+        , class "user-icon circle"
+        , onClick ToggleOpen
+        ]
+        []
     , viewPRInfo model
     ]

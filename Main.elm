@@ -142,10 +142,23 @@ viewAuthors authors =
     )
 
 
+viewHeaders : Int -> Int -> List (Html Msg)
+viewHeaders start end =
+  let
+    nString =
+      toString start
+  in
+    if start < end then
+      h1 [ class ("header-" ++ nString) ] [ text nString ] :: viewHeaders (start + 1) end
+    else
+      [ h1 [ class ("header-" ++ nString) ] [ text (nString ++ "+") ] ]
+
+
 view : Model -> Html Msg
 view model =
   div [ class "app-container" ]
-    [ h1 [] [ text "Open pull requests" ]
+    [ div [ class "headers" ]
+        (viewHeaders 1 4)
     , h4 [] [ text model.errorDescription ]
     , div [] (viewAuthors model.authors)
     , button [ class "btn", onClick RefreshStats ]

@@ -1,5 +1,7 @@
 .user-wrapper {
-  overflow: hidden;
+  display: inline-block;
+  position: absolute;
+  top: 30%;
 }
 
 .user-icon {
@@ -22,11 +24,11 @@ img {
 
 body {
   background: repeating-linear-gradient(
-    35deg,
+    -90deg,
     rgba(0, 0, 0, 0.5),
     rgba(0, 0, 0, 0.5) 4px,
-    rgba(0, 0, 0, 0.0) 1px,
-    rgba(0, 0, 0, 0.0) 19%
+    rgba(0, 0, 0, 0.0) 0px,
+    rgba(0, 0, 0, 0.0) 25%
   );
   position: absolute;
   top: 0;
@@ -35,11 +37,63 @@ body {
   left: 0;
 }
 
+.pull-requests {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  display: inline-block;
+  padding: 10px;
+  min-width: 100px;
+  white-space: nowrap;
+  z-index: 99;
+}
+
+.pr-count-0 {
+  left: 10px;
+}
+
+.pr-count-1 {
+  left: 9%;
+}
+
+.pr-count-2 {
+  left: 34%;
+}
+
+.pr-count-3 {
+  left: 59%;
+}
+
+.pr-count-4, .pr-count-5, .pr-count-6, .pr-count-7, .pr-count-8, .pr-count-9 {
+  left: 84%;
+}
+
+.headers>h1 {
+  padding-top: 20px;
+  display: inline-block;
+  position: absolute;
+}
+
+.header-1 {
+  left: 10.5%;
+}
+
+.header-2 {
+  left: 35.5%;
+}
+
+.header-3 {
+  left: 60%;
+}
+
+.header-4 {
+  left: 85%;
+}
 
 html {
 background: #16A085; /* fallback for old browsers */
-background: -webkit-linear-gradient(to top right, #16A085 , #F4D03F); /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to top right, #16A085 , #F4D03F); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+background: -webkit-linear-gradient(to right, #16A085 , #F4D03F); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #16A085 , #F4D03F); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 
 /* background: #3CA55C; /* fallback for old browsers */ */
