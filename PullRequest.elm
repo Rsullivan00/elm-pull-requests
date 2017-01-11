@@ -17,8 +17,7 @@ type alias Model =
 
 
 
--- UPDATE -- NONE YET
--- API stuff
+-- UPDATE
 
 
 decoder : Decoder Model

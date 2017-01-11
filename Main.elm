@@ -7,7 +7,9 @@ import Html.Attributes exposing (..)
 import Http
 import Task exposing (Task)
 import Json.Decode as Decode exposing ((:=), Decoder)
+import Dict
 import Repo
+import Author
 
 
 main : Program Never
@@ -26,19 +28,14 @@ main =
 
 type alias Model =
   { repos : List Repo.Model
+  , authors : List Author.Model
   , errorDescription : String
-  }
-
-
-type alias PRInfo =
-  { title : String
-  , user : String
   }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model [] "", fetchStatsCmd )
+  ( Model [] [] "", fetchStatsCmd )
 
 
 
@@ -58,10 +55,43 @@ update msg model =
       ( { model | errorDescription = "Error: " ++ (toString error) }, Cmd.none )
 
     FetchStats result ->
-      ( { model | repos = result }, Cmd.none )
+      ( { model | repos = result, authors = (reposToAuthors result) }, Cmd.none )
 
     RefreshStats ->
       ( model, fetchStatsCmd )
+
+
+listToDictOfLists : List ( comparable, a ) -> Dict.Dict comparable (List a)
+listToDictOfLists list =
+  let
+    insertBoth key leftVal rightVal dict =
+      Dict.insert key (leftVal ++ rightVal) dict
+
+    mergeDicts d1 d2 =
+      Dict.merge Dict.insert insertBoth Dict.insert d1 d2 Dict.empty
+
+    listOfDicts l =
+      List.map (\( a, b ) -> Dict.insert a [ b ] Dict.empty) l
+
+    dictOfLists l =
+      (List.foldl (\a b -> mergeDicts a b) Dict.empty) (listOfDicts l)
+  in
+    dictOfLists list
+
+
+reposToAuthors : List Repo.Model -> List Author.Model
+reposToAuthors repos =
+  let
+    flattenedPRList =
+      List.concatMap (\repo -> (List.map (\pr -> ( pr.user, pr )) repo.prs)) repos
+
+    prDict =
+      listToDictOfLists flattenedPRList
+
+    authorDict =
+      Dict.map (\key value -> Author.Model key value) prDict
+  in
+    Dict.values authorDict
 
 
 
@@ -97,7 +127,7 @@ view model =
   div [ class "container" ]
     [ h1 [] [ text "Open pull requests" ]
     , h4 [] [ text model.errorDescription ]
-    , div [] (List.map Repo.view model.repos)
+    , div [] (List.map Author.view model.authors)
     , button [ class "btn", onClick RefreshStats ]
         [ i [ class "material-icons left" ]
             [ text "loop" ]
