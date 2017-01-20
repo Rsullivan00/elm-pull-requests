@@ -5,7 +5,7 @@ import Html.App as Html
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Array
+import Array exposing (Array)
 import Task exposing (Task)
 import Json.Decode as Decode exposing ((:=), Decoder)
 import Dict
@@ -30,7 +30,7 @@ main =
 
 type alias Model =
   { repos : List Repo.Model
-  , authors : Array.Array Author.Model
+  , authors : Array Author.Model
   , errorDescription : String
   }
 
@@ -88,7 +88,7 @@ update msg model =
             ( { model | authors = updatedAuthors }, Cmd.none )
 
 
-reposToAuthors : List Repo.Model -> Array.Array Author.Model
+reposToAuthors : List Repo.Model -> Array Author.Model
 reposToAuthors repos =
   let
     flattenedPRList =
@@ -133,13 +133,36 @@ fetchStatsCmd =
 -- VIEW
 
 
-viewAuthors : Array.Array Author.Model -> List (Html Msg)
+filterAuthorsByPRCount :
+  Array Author.Model
+  -> (Int -> Bool)
+  -> Array Author.Model
+filterAuthorsByPRCount authors countFunction =
+  Array.filter (\author -> (countFunction (List.length author.prs))) authors
+
+
+authorsWithPRCount :
+  Array Author.Model
+  -> Int
+  -> Array Author.Model
+authorsWithPRCount authors count =
+  if count == 4 then
+    filterAuthorsByPRCount authors (\c -> c >= count)
+  else
+    filterAuthorsByPRCount authors (\c -> c == count)
+
+
+viewAuthors : Array Author.Model -> List (Html Msg)
 viewAuthors authors =
-  Array.toList
-    (Array.indexedMap
-      (\i author -> Html.map (AuthorMsg i) (Author.view author))
-      authors
-    )
+  let
+    filteredAuthors =
+      authorsWithPRCount authors 2
+  in
+    Array.toList
+      (Array.indexedMap
+        (\i author -> Html.map (AuthorMsg i) (Author.view author))
+        filteredAuthors
+      )
 
 
 viewHeaders : Int -> Int -> List (Html Msg)
