@@ -134,35 +134,31 @@ fetchStatsCmd =
 
 
 filterAuthorsByPRCount :
-  Array Author.Model
-  -> (Int -> Bool)
+  (Int -> Bool)
   -> Array Author.Model
-filterAuthorsByPRCount authors countFunction =
+  -> Array Author.Model
+filterAuthorsByPRCount countFunction authors =
   Array.filter (\author -> (countFunction (List.length author.prs))) authors
 
 
 authorsWithPRCount :
-  Array Author.Model
-  -> Int
+  Int
   -> Array Author.Model
-authorsWithPRCount authors count =
+  -> Array Author.Model
+authorsWithPRCount count authors =
   if count == 4 then
-    filterAuthorsByPRCount authors (\c -> c >= count)
+    filterAuthorsByPRCount (\c -> c >= count) authors
   else
-    filterAuthorsByPRCount authors (\c -> c == count)
+    filterAuthorsByPRCount (\c -> c == count) authors
 
 
 viewAuthors : Array Author.Model -> List (Html Msg)
 viewAuthors authors =
-  let
-    filteredAuthors =
-      authorsWithPRCount authors 2
-  in
-    Array.toList
-      (Array.indexedMap
-        (\i author -> Html.map (AuthorMsg i) (Author.view author))
-        filteredAuthors
-      )
+  Array.toList
+    (Array.indexedMap
+      (\i author -> Html.map (AuthorMsg i) (Author.view author))
+      (authorsWithPRCount 1 authors)
+    )
 
 
 viewHeaders : Int -> Int -> List (Html Msg)
