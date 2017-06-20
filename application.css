@@ -40,14 +40,14 @@ body {
 
 .authors-container {
   display: grid;
-  grid-template-columns: 25%;
-  grid-template-rows: 15% 15% 15% 15% 15% 15%;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
   width: 100vw;
   height: 100vh;
 }
 
 .pr-col {
-  text-align: center;
+  justify-self: center;
 }
 
 .pr-col-1 {
