@@ -178,11 +178,5 @@ view model =
   div [ class "app-container" ]
     [ div [ class "headers" ]
         (viewHeaders 1 4)
-    , h4 [] [ text model.errorDescription ]
-    , div [] (viewAuthors model.authors)
-    , button [ class "btn", onClick RefreshStats ]
-        [ i [ class "material-icons left" ]
-            [ text "loop" ]
-        , text "Refresh"
-        ]
+    , div [ class "authors-container" ] (viewAuthors model.authors)
     ]

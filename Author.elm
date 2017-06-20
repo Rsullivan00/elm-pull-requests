@@ -57,7 +57,7 @@ viewPRInfo model =
 
 view : Model -> Html Msg
 view model =
-  div [ class ("user-wrapper pr-count-" ++ toString (List.length model.prs)) ]
+  div [ class ("pr-col pr-col-" ++ toString (List.length model.prs)) ]
     [ img
         [ src (githubImageLocation model)
         , class "user-icon circle"

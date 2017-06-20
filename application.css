@@ -1,9 +1,3 @@
-.user-wrapper {
-  display: inline-block;
-  position: absolute;
-  top: 20%;
-}
-
 .user-icon {
   object-fit: cover;
   width: 100px;
@@ -23,18 +17,14 @@ img {
 }
 
 body {
-  background: repeating-linear-gradient(
-    -90deg,
-    rgba(0, 0, 0, 0.5),
-    rgba(0, 0, 0, 0.5) 4px,
-    rgba(0, 0, 0, 0.0) 0px,
-    rgba(0, 0, 0, 0.0) 25%
-  );
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  font-family: helvetica;
+  /* background: repeating-linear-gradient( */
+  /*   -90deg, */
+  /*   rgba(0, 0, 0, 0.5), */
+  /*   rgba(0, 0, 0, 0.5) 4px, */
+  /*   rgba(0, 0, 0, 0.0) 0px, */
+  /*   rgba(0, 0, 0, 0.0) 25% */
+  /* ); */
 }
 
 .pull-requests {
@@ -48,64 +38,33 @@ body {
   z-index: 99;
 }
 
-.pr-count-0 {
-  left: 10px;
+.authors-container {
+  display: grid;
+  grid-template-columns: 25%;
+  grid-template-rows: 15% 15% 15% 15% 15% 15%;
+  width: 100vw;
+  height: 100vh;
+}
+
+.pr-col {
+  text-align: center;
+}
+
+.pr-col-1 {
+  grid-column: 1;
 }
 
 
-.pr-count-1 {
-  left: 9%;
+.pr-col-2 {
+  grid-column: 2;
 }
 
-.pr-count-1:nth-of-type(1) {
-  top: 35%;
+.pr-col-3 {
+  grid-column: 3;
 }
 
-.pr-count-1:nth-of-type(2) {
-  top: 50%;
-}
-
-.pr-count-1:nth-of-type(3) {
-  top: 65%;
-}
-
-.pr-count-1:nth-of-type(4) {
-  top: 80%;
-}
-
-.pr-count-2 {
-  left: 34%;
-}
-
-.pr-count-2:nth-of-type(1) {
-  top: 35%;
-}
-
-.pr-count-2:nth-of-type(2) {
-  top: 50%;
-}
-
-.pr-count-2:nth-of-type(3) {
-  top: 65%;
-}
-
-.pr-count-3 {
-  left: 59%;
-}
-
-.pr-count-3:nth-of-type(1) {
-  top: 35%;
-}
-
-.pr-count-3:nth-of-type(2) {
-  top: 50%;
-}
-
-.pr-count-3:nth-of-type(3) {
-  top: 65%;
-}
-.pr-count-4, .pr-count-5, .pr-count-6, .pr-count-7, .pr-count-8, .pr-count-9 {
-  left: 84%;
+.pr-col-4, .pr-col-5, .pr-col-6, .pr-col-7, .pr-col-8, .pr-col-9 {
+  grid-column: 4;
 }
 
 .headers>h1 {
@@ -143,8 +102,8 @@ html {
 /* background: linear-gradient(to bottom, #3CA55C , #B5AC49); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ */
 
 
-background: #E55D87; /* fallback for old browsers */
-background: -webkit-linear-gradient(to left, #E55D87 , #5FC3E4); /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to left, #E55D87 , #5FC3E4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+/* background: #E55D87; /* fallback for old browsers */ */
+/* background: -webkit-linear-gradient(to left, #E55D87 , #5FC3E4); /* Chrome 10-25, Safari 5.1-6 */ */
+/* background: linear-gradient(to left, #E55D87 , #5FC3E4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ */
 /*  */
 }
