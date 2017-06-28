@@ -182,12 +182,20 @@ viewHeader idx =
     idx =
       toString idx
   in
-    h1 [ class ("header-" ++ idx) ] [ text idx ]
+    h1 [ class "col-count-header" ] [ text idx ]
 
 
-viewColumn : Int -> Model -> Html Msg
-viewColumn idx model =
-  viewHeader idx
+viewColumn : Int -> Array Author.Model -> Html Msg
+viewColumn idx authors =
+  let
+    header =
+      viewHeader idx
+
+    authorHtml =
+      viewAuthors authors
+  in
+    div [ class "pr-count-col" ]
+      (header :: authorHtml)
 
 
 viewColumns : Int -> Int -> Model -> List (Html Msg)
@@ -197,12 +205,12 @@ viewColumns start end model =
       authorsWithPRCount start model.authors
 
     column =
-      viewHeader start :: viewAuthors authors
+      viewColumn start authors
   in
     if start < end then
-      List.append column (viewColumns (start + 1) end model)
+      column :: (viewColumns (start + 1) end model)
     else
-      column
+      [ column ]
 
 
 view : Model -> Html Msg
