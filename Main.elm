@@ -205,14 +205,6 @@ viewColumns start end model =
       column
 
 
-
--- [ div [ class "headers-container" ]
---     (viewHeaders start end)
--- , div [ class "authors-container" ]
---     (viewAuthors model.authors)
--- ]
-
-
 view : Model -> Html Msg
 view model =
   div [ class "app-container" ]
