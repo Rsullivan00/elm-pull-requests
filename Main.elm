@@ -177,21 +177,40 @@ viewHeaders start end =
 
 
 viewHeader : Int -> Html Msg
-viewHeader n =
+viewHeader idx =
   let
-    n =
-      toString n
+    idx =
+      toString idx
   in
-    h1 [ class ("header-" ++ n) ] [ text n ]
+    h1 [ class ("header-" ++ idx) ] [ text idx ]
+
+
+viewColumn : Int -> Model -> Html Msg
+viewColumn idx model =
+  viewHeader idx
 
 
 viewColumns : Int -> Int -> Model -> List (Html Msg)
 viewColumns start end model =
-  [ div [ class "headers-container" ]
-      (viewHeaders start end)
-  , div [ class "authors-container" ]
-      (viewAuthors model.authors)
-  ]
+  let
+    authors =
+      authorsWithPRCount start model.authors
+
+    column =
+      viewHeader start :: viewAuthors authors
+  in
+    if start < end then
+      List.append column (viewColumns (start + 1) end model)
+    else
+      column
+
+
+
+-- [ div [ class "headers-container" ]
+--     (viewHeaders start end)
+-- , div [ class "authors-container" ]
+--     (viewAuthors model.authors)
+-- ]
 
 
 view : Model -> Html Msg
