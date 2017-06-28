@@ -137,8 +137,8 @@ filterAuthorsByPRCount :
   (Int -> Bool)
   -> Array Author.Model
   -> Array Author.Model
-filterAuthorsByPRCount countFunction authors =
-  Array.filter (\author -> (countFunction (List.length author.prs))) authors
+filterAuthorsByPRCount fn authors =
+  Array.filter (\author -> (fn (List.length author.prs))) authors
 
 
 authorsWithPRCount :
@@ -157,7 +157,7 @@ viewAuthors authors =
   Array.toList
     (Array.indexedMap
       (\i author -> Html.map (AuthorMsg i) (Author.view author))
-      (authorsWithPRCount 1 authors)
+      authors
     )
 
 
@@ -166,17 +166,35 @@ viewHeaders start end =
   let
     nString =
       toString start
+
+    header =
+      viewHeader start
   in
     if start < end then
-      h1 [ class ("header-" ++ nString) ] [ text nString ] :: viewHeaders (start + 1) end
+      header :: viewHeaders (start + 1) end
     else
-      [ h1 [ class ("header-" ++ nString) ] [ text (nString ++ "+") ] ]
+      [ header ]
+
+
+viewHeader : Int -> Html Msg
+viewHeader n =
+  let
+    n =
+      toString n
+  in
+    h1 [ class ("header-" ++ n) ] [ text n ]
+
+
+viewColumns : Int -> Int -> Model -> List (Html Msg)
+viewColumns start end model =
+  [ div [ class "headers-container" ]
+      (viewHeaders start end)
+  , div [ class "authors-container" ]
+      (viewAuthors model.authors)
+  ]
 
 
 view : Model -> Html Msg
 view model =
   div [ class "app-container" ]
-    [ div [ class "headers" ]
-        (viewHeaders 1 4)
-    , div [ class "authors-container" ] (viewAuthors model.authors)
-    ]
+    (viewColumns 1 4 model)
