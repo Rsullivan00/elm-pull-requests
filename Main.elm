@@ -88,32 +88,25 @@ update msg model =
             ( { model | prCountColumns = updatedPrCountColumns }, Cmd.none )
 
 
+mapReposToAuthors : List Repo.Model -> List Author.Model
+mapReposToAuthors repos =
+  repos
+    |> List.concatMap
+        (\repo -> List.map (\pr -> ( pr.user, pr )) repo.prs)
+    |> listToDictOfLists
+    |> Dict.map (\key value -> Author.create key value)
+    |> Dict.values
+
+
 mapReposToPRCountColumns : List Repo.Model -> Array PRCountColumn.Model
 mapReposToPRCountColumns repos =
-  let
-    flattenedPRList =
-      repos
-        |> List.concatMap
-            (\repo -> List.map (\pr -> ( pr.user, pr )) repo.prs)
-
-    prDict =
-      flattenedPRList
-        |> listToDictOfLists
-
-    authorDict =
-      prDict
-        |> Dict.map (\key value -> Author.create key value)
-
-    prCountDict =
-      authorDict
-        |> Dict.values
-        |> List.map (\author -> ( (List.length author.prs), author ))
-        |> listToDictOfLists
-  in
-    prCountDict
-      |> Dict.map (\count authors -> PRCountColumn.create count authors)
-      |> Dict.values
-      |> Array.fromList
+  repos
+    |> mapReposToAuthors
+    |> List.map (\author -> ( (List.length author.prs), author ))
+    |> listToDictOfLists
+    |> Dict.map (\count authors -> PRCountColumn.create count authors)
+    |> Dict.values
+    |> Array.fromList
 
 
 
