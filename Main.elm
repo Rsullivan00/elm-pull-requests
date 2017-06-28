@@ -11,6 +11,7 @@ import Json.Decode as Decode exposing ((:=), Decoder)
 import Dict
 import Repo
 import Author
+import PRCountColumn
 import Utils exposing (..)
 
 
@@ -29,15 +30,14 @@ main =
 
 
 type alias Model =
-  { repos : List Repo.Model
-  , authors : Array Author.Model
+  { prCountColumns : Array PRCountColumn.Model
   , errorDescription : String
   }
 
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model [] Array.empty "", fetchStatsCmd )
+  ( Model Array.empty "", fetchStatsCmd )
 
 
 
@@ -48,7 +48,7 @@ type Msg
   = HttpError Http.Error
   | FetchStats (List Repo.Model)
   | RefreshStats
-  | AuthorMsg Int Author.Msg
+  | ColumnMsg Int PRCountColumn.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,49 +58,62 @@ update msg model =
       ( { model | errorDescription = "Error: " ++ (toString error) }, Cmd.none )
 
     FetchStats result ->
-      ( { model | repos = result, authors = (reposToAuthors result) }, Cmd.none )
+      ( { model | prCountColumns = (mapReposToPRCountColumns result) }, Cmd.none )
 
     RefreshStats ->
       ( model, fetchStatsCmd )
 
-    AuthorMsg i authorMessage ->
-      case Array.get i model.authors of
+    ColumnMsg i msg ->
+      case Array.get i model.prCountColumns of
         Nothing ->
           ( model, Cmd.none )
 
-        Just author ->
+        Just column ->
           let
-            authors =
-              model.authors
+            columns =
+              model.prCountColumns
 
-            ( updatedAuthor, authorCmd ) =
-              Author.update authorMessage author
+            ( updatedColumn, columnCmd ) =
+              PRCountColumn.update msg column
 
-            beforeAuthors =
-              Array.slice 0 i authors
+            beforeColumns =
+              Array.slice 0 i columns
 
-            afterAuthors =
-              Array.slice (i + 1) (Array.length authors) authors
+            afterColumns =
+              Array.slice (i + 1) (Array.length columns) columns
 
-            updatedAuthors =
-              Array.append (Array.push updatedAuthor beforeAuthors) afterAuthors
+            updatedPrCountColumns =
+              Array.append (Array.push updatedColumn beforeColumns) afterColumns
           in
-            ( { model | authors = updatedAuthors }, Cmd.none )
+            ( { model | prCountColumns = updatedPrCountColumns }, Cmd.none )
 
 
-reposToAuthors : List Repo.Model -> Array Author.Model
-reposToAuthors repos =
+mapReposToPRCountColumns : List Repo.Model -> Array PRCountColumn.Model
+mapReposToPRCountColumns repos =
   let
     flattenedPRList =
-      List.concatMap (\repo -> (List.map (\pr -> ( pr.user, pr )) repo.prs)) repos
+      repos
+        |> List.concatMap
+            (\repo -> List.map (\pr -> ( pr.user, pr )) repo.prs)
 
     prDict =
-      listToDictOfLists flattenedPRList
+      flattenedPRList
+        |> listToDictOfLists
 
     authorDict =
-      Dict.map (\key value -> Author.create key value) prDict
+      prDict
+        |> Dict.map (\key value -> Author.create key value)
+
+    prCountDict =
+      authorDict
+        |> Dict.values
+        |> List.map (\author -> ( (List.length author.prs), author ))
+        |> listToDictOfLists
   in
-    Array.fromList (Dict.values authorDict)
+    prCountDict
+      |> Dict.map (\count authors -> PRCountColumn.create count authors)
+      |> Dict.values
+      |> Array.fromList
 
 
 
@@ -133,87 +146,18 @@ fetchStatsCmd =
 -- VIEW
 
 
-filterAuthorsByPRCount :
-  (Int -> Bool)
-  -> Array Author.Model
-  -> Array Author.Model
-filterAuthorsByPRCount fn authors =
-  Array.filter (\author -> (fn (List.length author.prs))) authors
-
-
-authorsWithPRCount :
-  Int
-  -> Array Author.Model
-  -> Array Author.Model
-authorsWithPRCount count authors =
-  if count == 4 then
-    filterAuthorsByPRCount (\c -> c >= count) authors
-  else
-    filterAuthorsByPRCount (\c -> c == count) authors
-
-
-viewAuthors : Array Author.Model -> List (Html Msg)
-viewAuthors authors =
-  Array.toList
-    (Array.indexedMap
-      (\i author -> Html.map (AuthorMsg i) (Author.view author))
-      authors
-    )
-
-
-viewHeaders : Int -> Int -> List (Html Msg)
-viewHeaders start end =
-  let
-    nString =
-      toString start
-
-    header =
-      viewHeader start
-  in
-    if start < end then
-      header :: viewHeaders (start + 1) end
-    else
-      [ header ]
-
-
-viewHeader : Int -> Html Msg
-viewHeader idx =
-  let
-    idx =
-      toString idx
-  in
-    h1 [ class "col-count-header" ] [ text idx ]
-
-
-viewColumn : Int -> Array Author.Model -> Html Msg
-viewColumn idx authors =
-  let
-    header =
-      viewHeader idx
-
-    authorHtml =
-      viewAuthors authors
-  in
-    div [ class "pr-count-col" ]
-      (header :: authorHtml)
-
-
-viewColumns : Int -> Int -> Model -> List (Html Msg)
-viewColumns start end model =
-  let
-    authors =
-      authorsWithPRCount start model.authors
-
-    column =
-      viewColumn start authors
-  in
-    if start < end then
-      column :: (viewColumns (start + 1) end model)
-    else
-      [ column ]
+viewColumns : List PRCountColumn.Model -> List (Html Msg)
+viewColumns columns =
+  columns
+    |> List.indexedMap (\i column -> Html.map (ColumnMsg i) (PRCountColumn.view column))
 
 
 view : Model -> Html Msg
 view model =
-  div [ class "app-container" ]
-    (viewColumns 1 4 model)
+  let
+    columns =
+      model.prCountColumns
+        |> Array.toList
+  in
+    div [ class "app-container" ]
+      (viewColumns columns)
