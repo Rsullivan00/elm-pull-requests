@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Array exposing (Array)
 import Author
+import Utils exposing (..)
 
 
 -- MODEL
@@ -34,28 +35,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     AuthorMsg i msg ->
-      case Array.get i model.authors of
-        Nothing ->
-          ( model, Cmd.none )
-
-        Just author ->
-          let
-            authors =
-              model.authors
-
-            ( updatedAuthor, authorCmd ) =
-              Author.update msg author
-
-            beforeAuthors =
-              Array.slice 0 i authors
-
-            afterAuthors =
-              Array.slice (i + 1) (Array.length authors) authors
-
-            updatedAuthors =
-              Array.append (Array.push updatedAuthor beforeAuthors) afterAuthors
-          in
-            ( { model | authors = updatedAuthors }, Cmd.none )
+      let
+        updatedAuthors =
+          updateAtIndex model.authors i Author.update msg
+      in
+        ( { model | authors = updatedAuthors }, Cmd.none )
 
 
 

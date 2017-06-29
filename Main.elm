@@ -64,28 +64,11 @@ update msg model =
       ( model, fetchStatsCmd )
 
     ColumnMsg i msg ->
-      case Array.get i model.prCountColumns of
-        Nothing ->
-          ( model, Cmd.none )
-
-        Just column ->
-          let
-            columns =
-              model.prCountColumns
-
-            ( updatedColumn, columnCmd ) =
-              PRCountColumn.update msg column
-
-            beforeColumns =
-              Array.slice 0 i columns
-
-            afterColumns =
-              Array.slice (i + 1) (Array.length columns) columns
-
-            updatedPrCountColumns =
-              Array.append (Array.push updatedColumn beforeColumns) afterColumns
-          in
-            ( { model | prCountColumns = updatedPrCountColumns }, Cmd.none )
+      let
+        updatedColumns =
+          updateAtIndex model.prCountColumns i PRCountColumn.update msg
+      in
+        ( { model | prCountColumns = updatedColumns }, Cmd.none )
 
 
 mapReposToAuthors : List Repo.Model -> List Author.Model

@@ -1,6 +1,7 @@
 module Utils exposing (..)
 
 import Dict
+import Array exposing (Array)
 
 
 insertBoth :
@@ -33,3 +34,26 @@ listToDictOfLists list =
       (List.foldl (\a b -> mergeDicts a b) Dict.empty) (tuplesToDicts l)
   in
     dictOfLists list
+
+
+updateAtIndex : Array a -> Int -> (c -> a -> ( a, d )) -> c -> Array a
+updateAtIndex models idx updateFn msg =
+  case Array.get idx models of
+    Nothing ->
+      models
+
+    Just model ->
+      let
+        before =
+          Array.slice 0 idx models
+
+        after =
+          Array.slice (idx + 1) (Array.length models) models
+
+        ( updatedModel, modelCmd ) =
+          updateFn msg model
+
+        updatedModels =
+          Array.append (Array.push updatedModel before) after
+      in
+        updatedModels
