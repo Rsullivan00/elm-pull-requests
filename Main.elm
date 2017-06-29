@@ -10,9 +10,9 @@ import Task exposing (Task)
 import Json.Decode as Decode exposing ((:=), Decoder)
 import Dict
 import Repo
-import Author
 import PRCountColumn
 import Utils exposing (..)
+import Api
 
 
 main : Program Never
@@ -58,7 +58,7 @@ update msg model =
       ( { model | errorDescription = "Error: " ++ (toString error) }, Cmd.none )
 
     FetchStats result ->
-      ( { model | prCountColumns = (mapReposToPRCountColumns result) }, Cmd.none )
+      ( { model | prCountColumns = (Api.mapReposToPRCountColumns result) }, Cmd.none )
 
     RefreshStats ->
       ( model, fetchStatsCmd )
@@ -71,51 +71,11 @@ update msg model =
         ( { model | prCountColumns = updatedColumns }, Cmd.none )
 
 
-mapReposToAuthors : List Repo.Model -> List Author.Model
-mapReposToAuthors repos =
-  repos
-    |> List.concatMap
-        (\repo -> List.map (\pr -> ( pr.user, pr )) repo.prs)
-    |> listToDictOfLists
-    |> Dict.map (\key value -> Author.create key value)
-    |> Dict.values
-
-
-mapReposToPRCountColumns : List Repo.Model -> Array PRCountColumn.Model
-mapReposToPRCountColumns repos =
-  repos
-    |> mapReposToAuthors
-    |> List.map (\author -> ( (List.length author.prs), author ))
-    |> listToDictOfLists
-    |> Dict.map (\count authors -> PRCountColumn.create count authors)
-    |> Dict.values
-    |> Array.fromList
-
-
-
--- API stuff
-
-
-api : String
-api =
-  "http://localhost:3000/"
-
-
-statsUrl : String
-statsUrl =
-  api ++ "stats"
-
-
-fetchStats : Platform.Task Http.Error (List Repo.Model)
-fetchStats =
-  Http.get (Decode.list Repo.decoder) statsUrl
-
-
 fetchStatsCmd : Cmd Msg
 fetchStatsCmd =
   Task.perform HttpError
     FetchStats
-    fetchStats
+    Api.fetchStats
 
 
 
