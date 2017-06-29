@@ -36,7 +36,7 @@ listToDictOfLists list =
     dictOfLists list
 
 
-updateAtIndex : Array a -> Int -> (c -> a -> ( a, d )) -> c -> Array a
+updateAtIndex : Array a -> Int -> (b -> a -> ( a, c )) -> b -> Array a
 updateAtIndex models idx updateFn msg =
   case Array.get idx models of
     Nothing ->
